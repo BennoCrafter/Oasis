@@ -43,20 +43,56 @@ class Tokenizer:
             info["var_name"] = code_snippet[1]
             info["value"] = code_snippet[3]
         elif keyword == "for":
+            info["keyword"] = "for_loop"
             info["iteration_count"] = int(code_snippet[1])
             info["var_to_iterate"] = code_snippet[3]
+            code = code_snippet[6:-1]
+            code_part = []
+            half_splitted_code = []
+            interim_storage = ""
+            for element in code:
+                if element[-1] == ";":
+                    code_part.append(interim_storage)
+                    code_part.append(element[:-1])
+                    half_splitted_code.append(code_part)
+                    code_part = []
+                    interim_storage = ""
+                else:
+                    interim_storage += element
+            complete_parsed_splitted_code = []
+            for command in half_splitted_code:
+                complete_parsed_splitted_code.append(self.get_info(code_snippet=command))
+            info["code_what_will_execute"] = complete_parsed_splitted_code
         return info
 
 
 if __name__ == "__main__":
     tokenizer = Tokenizer()
     tokens = []
-    with open("example_code.os", "r") as file:
-        code = file.read().split(";")
-    code.pop(-1)
+    filename = "example_code.os"
+    with open(filename, "r") as file:
+        codes = file.read()
+    file.close()
+    delimeter = ";"
+    bracket_info = ""
+    clipboard = ""
+    splitted = []
+
+    for char in codes:
+        if char == "(":
+            bracket_info = "("
+        elif char == ")":
+            bracket_info = ")"
+        if char == delimeter and bracket_info != "(":
+            splitted.append(clipboard)
+            clipboard = ""
+        else:
+            clipboard += char
+
+    codes = splitted
     splitted_code = []
     new_code = []
-    for line in code:
+    for line in codes:
         splitted_code.append(tokenizer.split_string(line))
     print(splitted_code)
 
