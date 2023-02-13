@@ -5,6 +5,7 @@ class Interpreter:
     def __init__(self):
         self.python_code = []
         self.vars = {}
+        self.lists = {}
         self.print_outputs = []
 
     def interprete(self, code_snippet):
@@ -19,10 +20,19 @@ class Interpreter:
                 else:
                     self.print_outputs.append(var_value)
             else:
-                pass
-                # todo add erro exception
+                if code_snippet["var_name"] in self.lists.keys():
+                    list_value = self.lists.get(code_snippet["var_name"])
+                    if code_snippet["index"] is None:
+                        self.print_outputs.append(list_value)
+                    else:
+                        self.print_outputs.append(list_value[code_snippet["index"] - 1])
+                else:
+                    # do exeception
+                    pass
         elif keyword == "var":
             self.vars[code_snippet.get("var_name")] = code_snippet.get("value")
+        elif keyword == "list":
+            self.lists[code_snippet.get("list_name")] = code_snippet.get("value")
         elif keyword == "for_loop":
             self.vars[code_snippet["var_to_iterate"]] = 0
             for i in range(code_snippet["iteration_count"]):
@@ -43,9 +53,11 @@ if __name__ == "__main__":
     code = [{"keyword": "write", "value": '"Test Output!"'},
             {"keyword": 'var', "var_name": 'test', 'value': '"That\'s a test value!"'},
             {"keyword": 'write_var', "var_name": "test"},
-            {"keyword": 'for_loop', "iteration_count": 10, "var_to_iterate": 'num',
+            {"keyword": 'for_loop', "iteration_count": 2, "var_to_iterate": 'num',
              "code_what_will_execute": [{"keyword": 'write', "value": '"Hello World!"'},
-                                        {"keyword": "write_var", "var_name": "num"}]}]
+                                        {"keyword": "write_var", "var_name": "num"}]},
+            {"keyword": "list", "list_name": "test_list", "value": ['first element', 'second element', 'thrid element']},
+            {"keyword": "write_var", "var_name": "test_list", "index": None}]
     # Output should be:
     # Test Output!
     # That's a test value!

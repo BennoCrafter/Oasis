@@ -1,3 +1,6 @@
+import ast
+
+
 class Tokenizer:
     def __init__(self):
         self.objects_to_split = [" ", "(", ")", ":", "\n", "\t"]
@@ -38,10 +41,22 @@ class Tokenizer:
                 info["value"] = code_snippet[1]
             else:
                 info["keyword"] = "write_var"
-                info["var_name"] = code_snippet[1]
+                last_elements = code_snippet[1][-3:]
+                if last_elements[-1] == "]":
+                    info["var_name"] = code_snippet[1][:-3]
+                    delete_index = last_elements.replace("[", "").replace("]", "")
+                    info["index"] = int(delete_index)
+                else:
+                    info["var_name"] = code_snippet[1]
+                    info["index"] = None
         elif keyword == "var":
             info["var_name"] = code_snippet[1]
             info["value"] = code_snippet[3]
+        elif keyword == "list":
+            info["list_name"] = code_snippet[1]
+            joined_list = ''.join(code_snippet[3:])
+            string_as_list = ast.literal_eval(joined_list)
+            info["value"] = string_as_list
         elif keyword == "for":
             info["keyword"] = "for_loop"
             info["iteration_count"] = int(code_snippet[1])
