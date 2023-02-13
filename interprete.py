@@ -13,7 +13,11 @@ class Interpreter:
             self.print_outputs.append(code_snippet["value"].replace("\"", ""))
         elif keyword == "write_var":
             if code_snippet["var_name"] in self.vars.keys():
-                self.print_outputs.append(self.vars.get(code_snippet["var_name"].replace("\"", "")))
+                var_value = self.vars.get(code_snippet["var_name"])
+                if isinstance(var_value, str):
+                    self.print_outputs.append(var_value.replace("\"", ""))
+                else:
+                    self.print_outputs.append(var_value)
             else:
                 pass
                 # todo add erro exception
