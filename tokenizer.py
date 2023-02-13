@@ -29,6 +29,24 @@ class Tokenizer:
         self.output = [x for x in self.output if x or x == 0]
         return self.output
 
+    def get_info(self, code_snippet):
+        info = {}
+        keyword = code_snippet[0]
+        info["keyword"] = keyword
+        if keyword == "write":
+            if code_snippet[1][0] == "\"" and code_snippet[1][-1] == "\"" or code_snippet[1][0] == "\'" and code_snippet[1][-1] == "\'":
+                info["value"] = code_snippet[1]
+            else:
+                info["keyword"] = "write_var"
+                info["var_name"] = code_snippet[1]
+        elif keyword == "var":
+            info["var_name"] = code_snippet[1]
+            info["value"] = code_snippet[3]
+        elif keyword == "for":
+            info["iteration_count"] = int(code_snippet[1])
+            info["var_to_iterate"] = code_snippet[3]
+        return info
+
 
 if __name__ == "__main__":
     tokenizer = Tokenizer()
@@ -36,7 +54,13 @@ if __name__ == "__main__":
     with open("example_code.os", "r") as file:
         code = file.read().split(";")
     code.pop(-1)
+    splitted_code = []
     new_code = []
     for line in code:
-        new_code.append(tokenizer.split_string(line))
+        splitted_code.append(tokenizer.split_string(line))
+    print(splitted_code)
+
+    for line in splitted_code:
+        new_code.append(tokenizer.get_info(code_snippet=line))
+
     print(new_code)
