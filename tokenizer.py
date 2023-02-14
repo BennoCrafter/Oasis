@@ -41,10 +41,10 @@ class Tokenizer:
                 info["value"] = code_snippet[1]
             else:
                 info["keyword"] = "write_var"
-                last_elements = code_snippet[1][-3:]
-                if last_elements[-1] == "]":
-                    info["var_name"] = code_snippet[1][:-3]
-                    delete_index = last_elements.replace("[", "").replace("]", "")
+                if "[" in code_snippet[1] and "]" in code_snippet[1]:
+                    indx = code_snippet[1].find("[")
+                    info["var_name"] = code_snippet[1][:indx]
+                    delete_index = code_snippet[1][indx:].replace("[", "").replace("]", "")
                     info["index"] = int(delete_index)
                 else:
                     info["var_name"] = code_snippet[1]

@@ -30,7 +30,17 @@ class Interpreter:
                     # do exeception
                     pass
         elif keyword == "var":
-            self.vars[code_snippet.get("var_name")] = code_snippet.get("value")
+            var_value = code_snippet.get("value")
+            if "\"" == var_value[0]:
+                # is a string
+                self.vars[code_snippet.get("var_name")] = var_value
+            elif var_value in self.vars.values():
+                # is a var
+                self.vars[code_snippet.get("var_name")] = self.vars.get(var_value)
+            elif var_value in self.lists.values():
+                # is a list
+                self.lists[code_snippet.get("var_name")] = self.lists.get(var_value)
+
         elif keyword == "list":
             self.lists[code_snippet.get("list_name")] = code_snippet.get("value")
         elif keyword == "for_loop":
@@ -39,6 +49,9 @@ class Interpreter:
                 self.vars[code_snippet["var_to_iterate"]] += 1
                 for deeper_code_snippet in code_snippet["code_what_will_execute"]:
                     self.deeper_interprete(deeper_code_snippet=deeper_code_snippet)
+        elif keyword == "if_condition":
+            pass
+            #todo
 
     def deeper_interprete(self, deeper_code_snippet):
         self.interprete(code_snippet=deeper_code_snippet)
@@ -46,6 +59,14 @@ class Interpreter:
     def print_output(self):
         for element in self.print_outputs:
             print(element)
+
+    def whats_it(self, snippet):
+        if snippet in self.vars.values():
+            return "var"
+        elif snippet in self.lists.values():
+            return "list"
+        elif "\"" in snippet:
+            return "string"
 
 
 if __name__ == "__main__":
@@ -57,7 +78,10 @@ if __name__ == "__main__":
              "code_what_will_execute": [{"keyword": 'write', "value": '"Hello World!"'},
                                         {"keyword": "write_var", "var_name": "num"}]},
             {"keyword": "list", "list_name": "test_list", "value": ['first element', 'second element', 'thrid element']},
-            {"keyword": "write_var", "var_name": "test_list", "index": None}]
+            {"keyword": "write_var", "var_name": "test_list", "index": None},
+            {"keyword": "if_condition", "first parameter": "test_list[1]", "second_parameter": '"first element"', "code_what_will_execute": [{"keyword": 'write', "value": '"True!"'}]},
+            {"keyword": "var", "var_name": "alsotest", "value": "test"},
+            {"keyword": "write_var", "var_name": "alsotest"}]
     # Output should be:
     # Test Output!
     # That's a test value!
@@ -68,3 +92,4 @@ if __name__ == "__main__":
         interpreter.interprete(code_snippet=code_snippet)
 
     interpreter.print_output()
+    print(interpreter.vars)
