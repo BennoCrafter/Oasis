@@ -18,7 +18,6 @@ class Interpreter:
                     if code_snippet["index"] is None:
                         self.print_outputs.append(var_value)
                     else:
-                        # why do i use here no -1? bcz of the "
                         var_value = var_value.replace("\"", "")
                         self.print_outputs.append(var_value[code_snippet["index"]-1])
                 else:
@@ -69,9 +68,13 @@ class Interpreter:
         elif keyword == "if_condition":
             result1 = self.whats_it(snippet=code_snippet.get("first_parameter"))
             result2 = self.whats_it(snippet=code_snippet.get("second_parameter"))
+            print(result1, result2)
             correct = False
             if code_snippet["art"] == "comparing":
                 if result1[1] == result2[1]:
+                    correct = True
+            elif code_snippet["art"] == "not_comparing":
+                if result1[1] != result2[1]:
                     correct = True
             if correct:
                 for deeper_code_snippet in code_snippet["code_what_will_execute"]:
@@ -89,16 +92,23 @@ class Interpreter:
             indx = snippet.find("[")
             name = snippet[:indx]
             index = snippet[indx:].replace("[", "").replace("]", "")
+            if name in self.vars.keys():
+                return "var", self.vars.get(name)[int(index)-1]
+            elif name in self.lists.keys():
+                return "list", self.lists.get(name)[int(index)-1]
+            elif "\"" in name:
+                return "string", snippet.replace("\"", "")
+            else:
+                return "unkown", snippet
         else:
-            name = snippet
-        if name in self.vars.keys():
-            return "var", self.vars.get(name)[int(index)-1]
-        elif name in self.lists.keys():
-            return "list", self.lists.get(name)[int(index)-1]
-        elif "\"" in name:
-            return "string", snippet.replace("\"", "")
-        else:
-            return "unkown", snippet
+            if snippet in self.vars.keys():
+                return "var", self.vars.get(snippet).replace("\"", "")
+            elif snippet in self.lists.keys():
+                return "list", self.lists.get(snippet).replace("\"", "")
+            elif "\"" in snippet:
+                return "string", snippet.replace("\"", "")
+            else:
+                return "unkown", snippet
 
 
 if __name__ == "__main__":

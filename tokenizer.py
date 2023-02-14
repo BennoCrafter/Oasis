@@ -101,6 +101,8 @@ class Tokenizer:
             info["second_parameter"] = code_snippet[3]
             if code_snippet[2] == "==":
                 info["art"] = "comparing"
+            elif code_snippet[2] == "!=":
+                info["art"] = "not_comparing"
 
             code = code_snippet[6:-1]
             code_part = []
