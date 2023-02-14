@@ -34,10 +34,10 @@ class Interpreter:
             if "\"" == var_value[0]:
                 # is a string
                 self.vars[code_snippet.get("var_name")] = var_value
-            elif var_value in self.vars.values():
+            elif var_value in self.vars.keys():
                 # is a var
                 self.vars[code_snippet.get("var_name")] = self.vars.get(var_value)
-            elif var_value in self.lists.values():
+            elif var_value in self.lists.keys():
                 # is a list
                 self.lists[code_snippet.get("var_name")] = self.lists.get(var_value)
 
