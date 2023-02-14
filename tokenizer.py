@@ -76,7 +76,7 @@ class Tokenizer:
                     info["index"] = None
         elif keyword == "for":
             info["keyword"] = "for_loop"
-            info["iteration_count"] = int(code_snippet[1])
+            info["iteration_count"] = code_snippet[1]
             info["var_to_iterate"] = code_snippet[3]
             code = code_snippet[6:-1]
             code_part = []

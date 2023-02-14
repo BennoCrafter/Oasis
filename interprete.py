@@ -61,10 +61,12 @@ class Interpreter:
 
         elif keyword == "for_loop":
             self.vars[code_snippet["var_to_iterate"]] = 0
-            for i in range(code_snippet["iteration_count"]):
+            iteration_count = self.whats_it(snippet=code_snippet["iteration_count"])
+            for i in range(int(iteration_count[1])):
                 self.vars[code_snippet["var_to_iterate"]] += 1
                 for deeper_code_snippet in code_snippet["code_what_will_execute"]:
                     self.deeper_interprete(deeper_code_snippet=deeper_code_snippet)
+
         elif keyword == "if_condition":
             result1 = self.whats_it(snippet=code_snippet.get("first_parameter"))
             result2 = self.whats_it(snippet=code_snippet.get("second_parameter"))
@@ -88,6 +90,8 @@ class Interpreter:
             print(element)
 
     def whats_it(self, snippet):
+        if isinstance(snippet, int):
+            return "int", snippet
         if snippet[-1] == "]":
             indx = snippet.find("[")
             name = snippet[:indx]
