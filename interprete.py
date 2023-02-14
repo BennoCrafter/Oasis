@@ -31,18 +31,31 @@ class Interpreter:
                     pass
         elif keyword == "var":
             var_value = code_snippet.get("value")
-            if "\"" == var_value[0]:
-                # is a string
-                self.vars[code_snippet.get("var_name")] = var_value
-            elif var_value in self.vars.keys():
-                # is a var
-                self.vars[code_snippet.get("var_name")] = self.vars.get(var_value)
-            elif var_value in self.lists.keys():
-                # is a list
-                self.lists[code_snippet.get("var_name")] = self.lists.get(var_value)
+            index = code_snippet.get("index")
+            if index is None:
+                if "\"" == var_value[0]:
+                    # is a string
+                    self.vars[code_snippet.get("var_name")] = var_value
+                elif var_value in self.vars.keys():
+                    # is a var
+                    self.vars[code_snippet.get("var_name")] = self.vars.get(var_value)
+                elif var_value in self.lists.keys():
+                    # is a list
+                    self.lists[code_snippet.get("var_name")] = self.lists.get(var_value)
+            else:
+                if var_value in self.vars.keys():
+                    # is a var
+                    self.vars[code_snippet.get("var_name")] = self.vars.get(var_value).replace("\"", "")[index-1]
+                elif var_value in self.lists.keys():
+                    # is a list
+                    self.vars[code_snippet.get("var_name")] = self.lists.get(var_value)[index-1]
 
         elif keyword == "list":
-            self.lists[code_snippet.get("list_name")] = code_snippet.get("value")
+            if not isinstance(code_snippet["value"], list):
+                self.lists[code_snippet.get("list_name")] = self.lists.get(code_snippet["value"])
+            else:
+                self.lists[code_snippet.get("list_name")] = code_snippet.get("value")
+
         elif keyword == "for_loop":
             self.vars[code_snippet["var_to_iterate"]] = 0
             for i in range(code_snippet["iteration_count"]):
@@ -51,7 +64,7 @@ class Interpreter:
                     self.deeper_interprete(deeper_code_snippet=deeper_code_snippet)
         elif keyword == "if_condition":
             pass
-            #todo
+            # todo
 
     def deeper_interprete(self, deeper_code_snippet):
         self.interprete(code_snippet=deeper_code_snippet)
@@ -77,10 +90,12 @@ if __name__ == "__main__":
             {"keyword": 'for_loop', "iteration_count": 2, "var_to_iterate": 'num',
              "code_what_will_execute": [{"keyword": 'write', "value": '"Hello World!"'},
                                         {"keyword": "write_var", "var_name": "num"}]},
-            {"keyword": "list", "list_name": "test_list", "value": ['first element', 'second element', 'thrid element']},
+            {"keyword": "list", "list_name": "test_list",
+             "value": ['first element', 'second element', 'thrid element']},
             {"keyword": "write_var", "var_name": "test_list", "index": None},
-            {"keyword": "if_condition", "first parameter": "test_list[1]", "second_parameter": '"first element"', "code_what_will_execute": [{"keyword": 'write', "value": '"True!"'}]},
-            {"keyword": "var", "var_name": "alsotest", "value": "test"},
+            {"keyword": "if_condition", "first parameter": "test_list[1]", "second_parameter": '"first element"',
+             "code_what_will_execute": [{"keyword": 'write', "value": '"True!"'}]},
+            {"keyword": "list", "list_name": "alsotest", "value": "test_list"},
             {"keyword": "write_var", "var_name": "alsotest"}]
     # Output should be:
     # Test Output!

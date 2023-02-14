@@ -51,12 +51,29 @@ class Tokenizer:
                     info["index"] = None
         elif keyword == "var":
             info["var_name"] = code_snippet[1]
-            info["value"] = code_snippet[3]
+            if "[" in code_snippet[3]:
+                indx = code_snippet[3].find("[")
+                info["value"] = code_snippet[3][:indx]
+                delete_index = code_snippet[3][indx:].replace("[", "").replace("]", "")
+                info["index"] = int(delete_index)
+            else:
+                info["value"] = code_snippet[3]
         elif keyword == "list":
             info["list_name"] = code_snippet[1]
             joined_list = ''.join(code_snippet[3:])
-            string_as_list = ast.literal_eval(joined_list)
-            info["value"] = string_as_list
+            if joined_list[0] == "[":
+                string_as_list = ast.literal_eval(joined_list)
+                info["value"] = string_as_list
+            else:
+                if code_snippet[3][-1] == "]":
+                    indx = code_snippet[3].find("[")
+                    info["value"] = code_snippet[3][:indx]
+                    delete_index = code_snippet[3][indx:].replace("[", "").replace("]", "")
+                    info["index"] = int(delete_index)
+                else:
+                    string_as_list = joined_list
+                    info["value"] = string_as_list
+                    info["index"] = None
         elif keyword == "for":
             info["keyword"] = "for_loop"
             info["iteration_count"] = int(code_snippet[1])
