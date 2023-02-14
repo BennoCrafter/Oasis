@@ -1,6 +1,8 @@
 list test_list = ["hello", "world"];
 var test = "abc";
 var another_test = test[1];
-write another_test;
+var x = test_list[1];
+write test[1];
+write x;
 for 2 with num:(write "Count:"; write num;);
-if test_list[1] == "first element":(write "True";);
+if test_list[1] == "hello":(write "True";);

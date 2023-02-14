@@ -25,6 +25,7 @@ class Oasis:
             self.interpreter.interprete(code_snippet=code_snippet)
 
         self.interpreter.print_output()
+        print(self.interpreter.vars)
 
 
 filename = "example_code.os"

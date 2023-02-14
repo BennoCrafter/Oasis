@@ -1,4 +1,3 @@
-import json
 
 
 class Interpreter:
@@ -16,7 +15,12 @@ class Interpreter:
             if code_snippet["var_name"] in self.vars.keys():
                 var_value = self.vars.get(code_snippet["var_name"])
                 if isinstance(var_value, str):
-                    self.print_outputs.append(var_value.replace("\"", ""))
+                    if code_snippet["index"] is None:
+                        self.print_outputs.append(var_value)
+                    else:
+                        # why do i use here no -1? bcz of the "
+                        var_value = var_value.replace("\"", "")
+                        self.print_outputs.append(var_value[code_snippet["index"]-1])
                 else:
                     self.print_outputs.append(var_value)
             else:
@@ -63,8 +67,15 @@ class Interpreter:
                 for deeper_code_snippet in code_snippet["code_what_will_execute"]:
                     self.deeper_interprete(deeper_code_snippet=deeper_code_snippet)
         elif keyword == "if_condition":
-            pass
-            # todo
+            result1 = self.whats_it(snippet=code_snippet.get("first_parameter"))
+            result2 = self.whats_it(snippet=code_snippet.get("second_parameter"))
+            correct = False
+            if code_snippet["art"] == "comparing":
+                if result1[1] == result2[1]:
+                    correct = True
+            if correct:
+                for deeper_code_snippet in code_snippet["code_what_will_execute"]:
+                    self.deeper_interprete(deeper_code_snippet=deeper_code_snippet)
 
     def deeper_interprete(self, deeper_code_snippet):
         self.interprete(code_snippet=deeper_code_snippet)
@@ -74,29 +85,32 @@ class Interpreter:
             print(element)
 
     def whats_it(self, snippet):
-        if snippet in self.vars.values():
-            return "var"
-        elif snippet in self.lists.values():
-            return "list"
-        elif "\"" in snippet:
-            return "string"
+        if snippet[-1] == "]":
+            indx = snippet.find("[")
+            name = snippet[:indx]
+            index = snippet[indx:].replace("[", "").replace("]", "")
+        else:
+            name = snippet
+        if name in self.vars.keys():
+            return "var", self.vars.get(name)[int(index)-1]
+        elif name in self.lists.keys():
+            return "list", self.lists.get(name)[int(index)-1]
+        elif "\"" in name:
+            return "string", snippet.replace("\"", "")
+        else:
+            return "unkown", snippet
 
 
 if __name__ == "__main__":
     interpreter = Interpreter()
-    code = [{"keyword": "write", "value": '"Test Output!"'},
-            {"keyword": 'var', "var_name": 'test', 'value': '"That\'s a test value!"'},
-            {"keyword": 'write_var', "var_name": "test"},
-            {"keyword": 'for_loop', "iteration_count": 2, "var_to_iterate": 'num',
-             "code_what_will_execute": [{"keyword": 'write', "value": '"Hello World!"'},
-                                        {"keyword": "write_var", "var_name": "num"}]},
+    code = [{"keyword": "write", "value": '"Test Output!"', "index": None},
+            {"keyword": 'var', "var_name": 'test', 'value': '"That\'s a test value!"', "index": None},
+            {"keyword": 'write_var', "var_name": "test", "index": None},
             {"keyword": "list", "list_name": "test_list",
-             "value": ['first element', 'second element', 'thrid element']},
+             "value": ['first element', 'second element', 'thrid element'], "index": None},
             {"keyword": "write_var", "var_name": "test_list", "index": None},
-            {"keyword": "if_condition", "first parameter": "test_list[1]", "second_parameter": '"first element"',
-             "code_what_will_execute": [{"keyword": 'write', "value": '"True!"'}]},
-            {"keyword": "list", "list_name": "alsotest", "value": "test_list"},
-            {"keyword": "write_var", "var_name": "alsotest"}]
+            {"keyword": "if_condition", "first_parameter": "test_list[1]", "second_parameter": '"first element"', "art": "comparing",
+             "code_what_will_execute": [{"keyword": 'write', "value": '"True!"'}]}]
     # Output should be:
     # Test Output!
     # That's a test value!

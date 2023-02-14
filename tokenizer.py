@@ -95,6 +95,31 @@ class Tokenizer:
             for command in half_splitted_code:
                 complete_parsed_splitted_code.append(self.get_info(code_snippet=command))
             info["code_what_will_execute"] = complete_parsed_splitted_code
+        elif keyword == "if":
+            info["keyword"] = "if_condition"
+            info["first_parameter"] = code_snippet[1]
+            info["second_parameter"] = code_snippet[3]
+            if code_snippet[2] == "==":
+                info["art"] = "comparing"
+
+            code = code_snippet[6:-1]
+            code_part = []
+            half_splitted_code = []
+            interim_storage = ""
+            for element in code:
+                if element[-1] == ";":
+                    code_part.append(interim_storage)
+                    code_part.append(element[:-1])
+                    half_splitted_code.append(code_part)
+                    code_part = []
+                    interim_storage = ""
+                else:
+                    interim_storage += element
+            complete_parsed_splitted_code = []
+            for command in half_splitted_code:
+                complete_parsed_splitted_code.append(self.get_info(code_snippet=command))
+            info["code_what_will_execute"] = complete_parsed_splitted_code
+
         return info
 
 
